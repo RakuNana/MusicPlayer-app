@@ -1,15 +1,16 @@
 import tkinter as tk
 from tkinter import Menu
 from tkinter import ttk , filedialog , Label , Button , Scale , Frame
-import pygame
+import time
 import os
+import pygame
 from pygame import mixer
 from PIL import Image , ImageTk
 
 
 root = tk.Tk()
 root.title("Music App")
-root.geometry("420x330")
+root.geometry("420x360")
 root.configure(bg="black")
 root.option_add("*background" , "black")
 root.option_add("*foreground" , "red")
@@ -74,12 +75,13 @@ def play_music():
             mixer.music.load(load_music)
             mixer.music.play()
             error_label.config(text="")
+            #duration_bar()
     except:
         error_label.config(text="Please select a sound file first!!!")
 
+
 def stop_music():
 
-    playing_music = False
     mixer.music.stop()
 
 def pause_music():
@@ -111,9 +113,21 @@ def duration_bar():
     slider_frame = Frame(root)
     slider_frame.grid(row=2)
 
-    dur_bar = tk.Scale(slider_frame,sliderlength=10,length=413,from_=0,to=100,orient="horizontal")
+    current_pos = pygame.mixer.music.get_pos() / 1000
+    clock_time = time.strftime("%H:%M:%S" , time.gmtime(current_pos))
+
+    dur_label = Label(slider_frame)
+    dur_label.grid(row=3,column=2)
+
+    dur_label.config(text=clock_time)
+    dur_label.after(1000, duration_bar)
+
+    dur_bar = tk.Scale(slider_frame,sliderlength=10,length=413,from_=0,to=100,orient="horizontal",command=track_song_pos)
     dur_bar.grid(row=4,column=2)
-    dur_bar["state"] = "disabled"
+    #dur_bar["state"] = "disabled"
+
+def track_song_pos(song_pos):
+    print("tracking")
 
 def menu_options():
 
@@ -124,9 +138,8 @@ def menu_options():
 
 def file_commands():
 
-    file_menu.add_command(label="New", command=None)
-    file_menu.add_command(label="Open" , command=open_path)
-    file_menu.add_command(label="Save" , command=None)
+    file_menu.add_command(label="Add sound file" , command=open_path)
+    file_menu.add_command(label="Save playlist" , command=None)
     file_menu.add_command(label="Play" , command=play_music)
     file_menu.add_command(label="Stop" , command=stop_music)
 
